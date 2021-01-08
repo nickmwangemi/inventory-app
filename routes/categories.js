@@ -84,7 +84,7 @@ router.delete('/:id', async (req, res) => {
 		const found = await Category.findById(req.params.id)
 
 		if (found) {
-			Category.deleteOne(found)
+			await Category.deleteOne(found)
 			res
 				.status(200)
 				.json({ msg: `Category with ID of ${req.params.id} Deleted` })
