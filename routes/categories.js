@@ -26,9 +26,11 @@ router.post('/', async (req, res) => {
 	if (!categoryToSave.name || !categoryToSave.description) {
 		res.status(400).json({ msg: 'Please include a name and description' })
 	}
-	await categoryToSave.save().then(console.log('Saved'))
-
-	res.status(201).json({ msg: 'Category Created', Payload: categoryToSave })
+	await categoryToSave
+		.save()
+		.then(
+			res.status(201).json({ msg: 'Category Created', Payload: categoryToSave })
+		)
 })
 
 // @desc Fetch single category
