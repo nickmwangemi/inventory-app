@@ -59,13 +59,18 @@ router.put('/:id', async (req, res) => {
 			found.name = req.body.name
 			found.description = req.body.description
 
-			found.save()
+			await found.save().then(
+				res.status(200).json({
+					msg: `Category with ID of ${req.params.id} Updated`,
+					Payload: found,
+				})
+			)
 		}
 
-		await res.status(200).json({
-			msg: `Category with ID of ${req.params.id} Updated`,
-			Payload: found,
-		})
+		// res.status(200).json({
+		// 	msg: `Category with ID of ${req.params.id} Updated`,
+		// 	Payload: found,
+		// })
 	} catch (error) {
 		res
 			.status(404)
