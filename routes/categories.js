@@ -38,14 +38,14 @@ router.post('/', async (req, res) => {
 // @route GET api/v1/categories/:id
 // @access Public
 router.get('/:id', async (req, res) => {
-	const category = await Category.findOne({ _id: req.params.id }).then(
-		console.log('\nCategory Fetched')
-	)
+	try {
+		const category = await Category.findById(req.params.id)
 
-	if (!category) {
-		res.status(404).json({ msg: 'Category Not Found' })
-	} else {
-		res.json(category)
+		res.status(200).json({ msg: 'Category Fetched!', Payload: category })
+	} catch (error) {
+		res
+			.status(404)
+			.json({ msg: `Category with ID of ${req.params.id} Not Found` })
 	}
 })
 
@@ -69,11 +69,6 @@ router.put('/:id', async (req, res) => {
 				})
 			)
 		}
-
-		// res.status(200).json({
-		// 	msg: `Category with ID of ${req.params.id} Updated`,
-		// 	Payload: found,
-		// })
 	} catch (error) {
 		res
 			.status(404)
@@ -93,12 +88,10 @@ router.delete('/:id', async (req, res) => {
 			res
 				.status(200)
 				.json({ msg: `Category with ID of ${req.params.id} Deleted` })
-		} else {
-			res.status(404)
-			res.json({ msg: `Category with ID of ${req.params.id} Not Found` })
 		}
 	} catch (err) {
-		throw new Error('An Error Occured', err)
+		res.status(404)
+		res.json({ msg: `Category with ID of ${req.params.id} Not Found` })
 	}
 })
 
