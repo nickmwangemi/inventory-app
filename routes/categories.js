@@ -1,4 +1,5 @@
 const express = require('express')
+const { Error } = require('mongoose')
 const uuid = require('uuid')
 const Category = require('../models/categoryModel')
 const router = express.Router()
@@ -83,8 +84,22 @@ router.put('/:id', async (req, res) => {
 // @desc Delete a category
 // @route DELETE api/v1/categories/:id
 // @access Public
-router.put('/', async (req, res) => {
-	res.send('All categories')
+router.delete('/:id', async (req, res) => {
+	try {
+		const found = await Category.findById(req.params.id)
+
+		if (found) {
+			await Category.deleteOne({ _id: req.params.id })
+			res
+				.status(200)
+				.json({ msg: `Category with ID of ${req.params.id} Deleted` })
+		} else {
+			res.status(404)
+			res.json({ msg: `Category with ID of ${req.params.id} Not Found` })
+		}
+	} catch (err) {
+		throw new Error('An Error Occured', err)
+	}
 })
 
 module.exports = router
