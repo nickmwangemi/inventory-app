@@ -1,11 +1,18 @@
 const mongoose = require('mongoose')
 
-//Set up default mongoose connection
-const mongoDB = 'mongodb://127.0.0.1/InventoryApp'
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+const connectDB = async () => {
+	try {
+		const mongoDB = 'mongodb://localhost:27017/InventoryApp'
 
-//Get the default connection
-const db = mongoose.connection
+		const conn = await mongoose.connect(mongoDB, {
+			useNewUrlParser: true,
+			useUnifiedTopology: true,
+			useCreateIndex: true,
+		})
 
-//Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error'))
+		console.log(`\nMongoDB Connected: ${conn.connection.host} `)
+	} catch (error) {
+		console.error(`\nError: ${error.message}`)
+		process.exit(1)
+	}
+}
