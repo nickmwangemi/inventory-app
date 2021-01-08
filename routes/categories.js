@@ -6,7 +6,7 @@ const router = express.Router()
 // @desc Fetch all categories
 // @route GET api/v1/categories
 // @access Public
-router.get('/', async function (req, res) {
+router.get('/', async (req, res) => {
 	const categories = await Category.find({})
 	res.status(200).json({ msg: 'Categories Fetched!', Payload: categories })
 })
@@ -34,21 +34,49 @@ router.post('/', async (req, res) => {
 // @desc Fetch single category
 // @route GET api/v1/categories/:id
 // @access Public
-router.get('/', function (req, res) {
-	res.send('All categories')
+router.get('/:id', async (req, res) => {
+	const category = await Category.findOne({ _id: req.params.id }).then(
+		console.log('\nCategory Fetched')
+	)
+
+	if (!category) {
+		res.status(404).json({ msg: 'Category Not Found' })
+	} else {
+		res.json(category)
+	}
 })
 
 // @desc Update a category
 // @route GET api/v1/categories/:id
 // @access Public
-router.put('/', function (req, res) {
-	res.send('All categories')
+router.put('/:id', async (req, res) => {
+	try {
+		const found = await Category.findById(req.params.id)
+
+		if (req.body.name === '' || req.body.email === '') {
+			res.status(400).json({ msg: 'Please include a name and description' })
+		} else {
+			found.name = req.body.name
+			found.description = req.body.description
+
+			found.save()
+		}
+
+		await res.status(200).json({
+			msg: `Category with ID of ${req.params.id} Updated`,
+			Payload: found,
+		})
+	} catch (error) {
+		res
+			.status(404)
+			.json({ msg: `Category with ID of ${req.params.id} Not Found` })
+	}
 })
 
 // @desc Delete a category
 // @route DELETE api/v1/categories/:id
 // @access Public
-router.put('/', function (req, res) {
+router.put('/', async (req, res) => {
 	res.send('All categories')
 })
 
