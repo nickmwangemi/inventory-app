@@ -41,7 +41,13 @@ router.get('/:id', async (req, res) => {
 	try {
 		const category = await Category.findById(req.params.id)
 
-		res.status(200).json({ msg: 'Category Fetched!', Payload: category })
+		if (!category) {
+			res
+				.status(404)
+				.json({ msg: `Category with ID of ${req.params.id} Not Found` })
+		} else {
+			res.status(200).json({ msg: 'Category Fetched!', Payload: category })
+		}
 	} catch (error) {
 		res
 			.status(404)
@@ -80,18 +86,21 @@ router.put('/:id', async (req, res) => {
 // @route DELETE api/v1/categories/:id
 // @access Public
 router.delete('/:id', async (req, res) => {
+	const { id } = req.params
 	try {
-		const found = await Category.findById(req.params.id)
+		const found = await Category.findById(id)
 
 		if (found) {
-			await Category.deleteOne(found)
-			res
-				.status(200)
-				.json({ msg: `Category with ID of ${req.params.id} Deleted` })
+			await Category.deleteOne(found).then(
+				res
+					.status(200)
+					.json({ msg: `Category with ID of ${req.params.id} Deleted` })
+			)
 		}
-	} catch {
-		res.status(404)
 		res.json({ msg: `Category with ID of ${req.params.id} Not Found` })
+	} catch {
+		res.status(400)
+		res.json({ error: `Bad Request` })
 	}
 })
 
