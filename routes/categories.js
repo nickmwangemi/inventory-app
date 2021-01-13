@@ -1,19 +1,22 @@
 const express = require('express')
-const { Error } = require('mongoose')
 const uuid = require('uuid')
 const Category = require('../models/categoryModel')
 const router = express.Router()
 
 // @desc Fetch all categories
-// @route GET api/v1/categories
+// @route GET /categories
 // @access Public
 router.get('/', async (req, res) => {
 	const categories = await Category.find({})
-	res.status(200).json({ msg: 'Categories Fetched!', Payload: categories })
+
+	res.render('categories', {
+		title: 'Inventory App',
+		categories: categories,
+	})
 })
 
 // @desc Create a new category
-// @route POST api/v1/categories
+// @route POST /categories
 // @access Public
 router.post('/', async (req, res) => {
 	const { name, description } = req.body
@@ -35,18 +38,24 @@ router.post('/', async (req, res) => {
 })
 
 // @desc Fetch single category
-// @route GET api/v1/categories/:id
+// @route GET /categories/:id
 // @access Public
 router.get('/:id', async (req, res) => {
 	try {
 		const category = await Category.findById(req.params.id)
+		const categories = await Category.find({})
 
 		if (!category) {
 			res
 				.status(404)
 				.json({ msg: `Category with ID of ${req.params.id} Not Found` })
 		} else {
-			res.status(200).json({ msg: 'Category Fetched!', Payload: category })
+			// res.status(200).json({ msg: 'Category Fetched!', Payload: category })
+			res.render('categoryDetail', {
+				title: 'Inventory App',
+				category: category,
+				categories: categories,
+			})
 		}
 	} catch (error) {
 		res
@@ -56,7 +65,7 @@ router.get('/:id', async (req, res) => {
 })
 
 // @desc Update a category
-// @route GET api/v1/categories/:id
+// @route PUT /categories/:id
 // @access Public
 router.put('/:id', async (req, res) => {
 	try {
@@ -83,7 +92,7 @@ router.put('/:id', async (req, res) => {
 })
 
 // @desc Delete a category
-// @route DELETE api/v1/categories/:id
+// @route DELETE /categories/:id
 // @access Public
 router.delete('/:id', async (req, res) => {
 	const { id } = req.params
@@ -91,11 +100,7 @@ router.delete('/:id', async (req, res) => {
 		const found = await Category.findById(id)
 
 		if (found) {
-			await Category.deleteOne(found).then(
-				res
-					.status(200)
-					.json({ msg: `Category with ID of ${req.params.id} Deleted` })
-			)
+			await Category.deleteOne(found).then(res.redirect('/categories'))
 		}
 		res.json({ msg: `Category with ID of ${req.params.id} Not Found` })
 	} catch {
